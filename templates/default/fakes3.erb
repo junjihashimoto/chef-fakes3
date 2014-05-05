@@ -1,0 +1,90 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:        fakes3
+# Required-Start:  $remote_fs $syslog
+# Required-Stop:   $remote_fs $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop:    0 1 6
+# Short-Description: fakes3
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+RUN=yes
+DAEMON=/usr/local/bin/fakes3
+S3PORT=<%= @s3port %>
+S3ROOT=<%= @s3root %>
+
+PIDFILE=/var/run/fakes3.pid
+DESC=fakes3
+NAME=fakes3
+CONF=/etc/ckvs/api-server/config/settings.yml
+
+test -x $DAEMON || exit 0
+
+# Include fakes3 defaults if available
+if [ -f /etc/default/fakes3 ] ; then
+	. /etc/default/fakes3
+fi
+
+DAEMON_ARGS="-r $S3ROOT -p $S3PORT"
+WORKDIR=$S3ROOT
+
+set -e
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	if [ $RUN = "yes" ]; then
+		if [ ! -e $PIDFILE ] ;then
+			start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --chdir $WORKDIR --exec $DAEMON -- $DAEMON_ARGS
+		fi
+		echo "$NAME."
+	else
+		echo "disabled (skip starting)."
+	fi
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	if [ $RUN = "yes" ]; then
+		if [ -e $PIDFILE ] ;then
+			start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+		fi
+		if [ -e $PIDFILE ] ;then
+		    rm $PIDFILE
+		fi
+		echo "$NAME."
+	else
+		echo "disabled (skip stopping)."
+	fi
+	;;
+  reload)
+	if [ $RUN = "yes" ]; then
+		echo "Reloading $DESC configuration files."
+		start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --exec $DAEMON
+	fi
+  	;;
+  restart)
+    echo -n "Restarting $DESC: "
+	if [ $RUN = "yes" ]; then
+		if [ -e $PIDFILE ] ;then
+		    start-stop-daemon --stop --quiet --pidfile $PIDFILE --exec $DAEMON
+		    sleep 1
+		fi
+		if [ -e $PIDFILE ] ;then
+		    rm $PIDFILE
+		fi
+		start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile --background --chdir $WORKDIR --exec $DAEMON -- $DAEMON_ARGS
+		echo "$NAME."
+	else
+		echo "disable (skip restarting)."
+	fi
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

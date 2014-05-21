@@ -40,6 +40,7 @@ template "/etc/init.d/fakes3" do
   variables({
               "s3root"        => node["fake-s3"]["s3root"],
               "s3port"        => node["fake-s3"]["s3port"],
+              "s3hostname"    => node["fake-s3"]["s3hostname"],
             })
   # notifies :restart, 'service[fakes3]'
 end

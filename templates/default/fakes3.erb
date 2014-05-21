@@ -14,6 +14,7 @@ RUN=yes
 DAEMON=/usr/local/bin/fakes3
 S3PORT=<%= @s3port %>
 S3ROOT=<%= @s3root %>
+S3HOSTNAME=<%= @s3hostname %>
 
 PIDFILE=/var/run/fakes3.pid
 DESC=fakes3
@@ -27,7 +28,7 @@ if [ -f /etc/default/fakes3 ] ; then
 	. /etc/default/fakes3
 fi
 
-DAEMON_ARGS="-r $S3ROOT -p $S3PORT"
+DAEMON_ARGS="server -h $S3HOSTNAME -r $S3ROOT -p $S3PORT"
 WORKDIR=$S3ROOT
 
 set -e

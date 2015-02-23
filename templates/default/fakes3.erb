@@ -28,7 +28,7 @@ if [ -f /etc/default/fakes3 ] ; then
 	. /etc/default/fakes3
 fi
 
-DAEMON_ARGS="server -h $S3HOSTNAME -r $S3ROOT -p $S3PORT"
+DAEMON_ARGS="server --hostname $S3HOSTNAME -r $S3ROOT -p $S3PORT"
 WORKDIR=$S3ROOT
 
 set -e

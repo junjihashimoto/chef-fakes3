@@ -15,6 +15,7 @@ directory node["fake-s3"]["s3root"] do
 end
 
 gem_package "fakes3" do
+  version "0.1.5.2"
   action :install
 end
 
